@@ -14,25 +14,17 @@ jobs:
       - name: Install Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.6.1'
-
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android tools
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Build APK
-        run: gradle assembleDebug
+        run: ./gradlew assembleDebug || gradle assembleDebug
 
       - name: Save APK
         uses: actions/upload-artifact@v4
         with:
-          name: watar-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
