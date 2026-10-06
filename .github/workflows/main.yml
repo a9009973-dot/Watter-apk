@@ -8,23 +8,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download project
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Java
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Build APK
-        run: ./gradlew assembleDebug || gradle assembleDebug
+      - name: Build APK with Cordova
+        run: |
+          npm install -g cordova
+          cordova create myApp com.example.watter WatterApp
+          cd myApp
+          rm -rf www/*
+          cp -r ../* www/ || true
+          cordova platform add android
+          cordova build android --debug
 
       - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
